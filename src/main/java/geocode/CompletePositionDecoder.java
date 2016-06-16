@@ -7,18 +7,53 @@ import java.io.IOException;
 
 public class CompletePositionDecoder {
 
-	public static void main(String args[]) throws FileNotFoundException,
-			IOException {
-		ClassLoader classLoader = CompletePositionDecoder.class.getClassLoader();
-		String fileName = "cities15000.txt";
-		File file = new File(classLoader.getResource(fileName).getFile());
-		ReverseGeoCode reverseGeoCode = new ReverseGeoCode(new FileInputStream(file), true);
-		GeoName location = reverseGeoCode.nearestPlace(9.986151, 76.2879012);
-		RegionMapper regionMapper = new RegionMapper("admin1CodesASCII.txt", '\t',0, 2);
+	ReverseGeoCode reverseGeoCode;
+	RegionMapper regionMapper;
+
+	String countryDataFile = "cities15000.txt";
+	String adminDataFile = "admin1CodesASCII.txt";
+
+	private CompletePositionDecoder() throws FileNotFoundException, IOException {
+		init();
+	}
+
+	private void init() throws FileNotFoundException, IOException {
+		ClassLoader classLoader = CompletePositionDecoder.class
+				.getClassLoader();
+		File file = new File(classLoader.getResource(countryDataFile).getFile());
+		reverseGeoCode = new ReverseGeoCode(new FileInputStream(file), true);
+		regionMapper = new RegionMapper(adminDataFile, '\t', 0, 2);
 		regionMapper.generateMap();
-		location.setSubRegionName( regionMapper.getValue(location.country + "."
-				+ location.subRegion));
-		System.out.println("Nearest is "+ location);
-		;
+	}
+
+	public CompletePositionDecoder(String countryDataFile, String adminDataFile)
+			throws FileNotFoundException, IOException {
+		this.countryDataFile = countryDataFile;
+		this.adminDataFile = adminDataFile;
+		init();
+	}
+
+	static CompletePositionDecoder INSTANCE;
+
+	static CompletePositionDecoder getInstance() throws FileNotFoundException,
+			IOException {
+		if (INSTANCE == null) {
+			INSTANCE = new CompletePositionDecoder();
+		}
+		return INSTANCE;
+	}
+
+	static CompletePositionDecoder getInstance(String countryDataFile,
+			String adminDataFile) throws FileNotFoundException, IOException {
+		if (INSTANCE == null) {
+			INSTANCE = new CompletePositionDecoder(countryDataFile,
+					adminDataFile);
+		}
+		return INSTANCE;
+	}
+
+	public GeoName getNearestLocation(Double lat, Double lon) {
+		GeoName location = reverseGeoCode.nearestPlace(lat, lon);
+		return location;
 	}
 }
