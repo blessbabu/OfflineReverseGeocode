@@ -40,11 +40,13 @@ import java.util.Comparator;
 
 public class GeoName extends KDNodeComparator<GeoName> {
     public String name;
+    public String subRegion;
     public boolean majorPlace; // Major or minor place
     public double latitude;
     public double longitude;
     public double point[] = new double[3]; // The 3D coordinates of the point
     public String country;
+    public String subRegionName;
 
     GeoName(String data) {
         String[] names = data.split("\t");
@@ -52,11 +54,20 @@ public class GeoName extends KDNodeComparator<GeoName> {
         majorPlace = names[6].equals("P");
         latitude = Double.parseDouble(names[4]);
         longitude = Double.parseDouble(names[5]);
+        subRegion = names[10];
         setPoint();
         country = names[8];
     }
+    
+    public String getSubRegionName() {
+		return subRegionName;
+	}
 
-    GeoName(Double latitude, Double longitude) {
+	public void setSubRegionName(String subRegionName) {
+		this.subRegionName = subRegionName;
+	}
+
+	GeoName(Double latitude, Double longitude) {
         name = country = "Search";
         this.latitude = latitude;
         this.longitude = longitude;
@@ -71,7 +82,7 @@ public class GeoName extends KDNodeComparator<GeoName> {
 
     @Override
     public String toString() {
-        return name;
+        return name + "," + subRegion + "(" + subRegionName + ")," + country;
     }
 
     @Override
