@@ -86,7 +86,7 @@ public class ReverseGeoCode {
         try {
             while ((str = in.readLine()) != null) {
                 GeoName newPlace = new GeoName(str);
-                if ( !majorOnly || newPlace.majorPlace ) {
+                if ( !majorOnly || newPlace.isMajorPlace() ) {
                     arPlaceNames.add(newPlace);
                 }
             }

@@ -39,24 +39,73 @@ import java.util.Comparator;
  */
 
 public class GeoName extends KDNodeComparator<GeoName> {
-    public String name;
-    public String subRegion;
-    public boolean majorPlace; // Major or minor place
-    public double latitude;
-    public double longitude;
-    public double point[] = new double[3]; // The 3D coordinates of the point
-    public String country;
-    public String subRegionName;
+    private String name;
+    private String subRegion;
+    private boolean majorPlace; // Major or minor place
+    private double latitude;
+    private double longitude;
+    private double point[] = new double[3]; // The 3D coordinates of the point
+    private String country;
+    private String subRegionName;
 
-    GeoName(String data) {
+    public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSubRegion() {
+		return subRegion;
+	}
+
+	public void setSubRegion(String subRegion) {
+		this.subRegion = subRegion;
+	}
+
+	public boolean isMajorPlace() {
+		return majorPlace;
+	}
+
+	public void setMajorPlace(boolean majorPlace) {
+		this.majorPlace = majorPlace;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	GeoName(String data) {
         String[] names = data.split("\t");
-        name = names[1];
-        majorPlace = names[6].equals("P");
-        latitude = Double.parseDouble(names[4]);
-        longitude = Double.parseDouble(names[5]);
-        subRegion = names[10];
+        this.setName(names[1]);
+        this.setMajorPlace(names[6].equals("P"));
+        this.setLatitude(Double.parseDouble(names[4]));
+        this.setLongitude(Double.parseDouble(names[5]));
+        this.setSubRegion(names[10]);
         setPoint();
-        country = names[8];
+        this.setCountry(names[8]);
+       
     }
     
     public String getSubRegionName() {

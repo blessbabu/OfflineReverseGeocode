@@ -34,7 +34,7 @@ public class RegionMapper {
 		File file = new File(classLoader.getResource(fileName).getFile());
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		while(true){
-			try {
+			
 				String geoData=br.readLine();
 				if(geoData == null){
 					break;
@@ -42,11 +42,7 @@ public class RegionMapper {
 				String[] geoDetails=geoData.split("" + regexSpilt);
 				values.put(geoDetails[Keyposition], geoDetails[valuePosition]);
 				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return false;
-			}
+			
 		}
 		return true;
 		
