@@ -10,16 +10,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class LocationFinder {
 	String gnipData;
-
-	public GeoName findLocation(String gnipDataInput) throws IOException {
-		
-			GeoName countryLocation = null;
-		
+	Logger logger=Logger.getLogger(LocationFinder.class.getName());
+	GeoName geoLocation=null;
+	JSONObject geoDetails=new JSONObject();
+	public JSONObject findLocation(String gnipDataInput) {
+		try{
+			
+			
 				JSONObject jsonData = new JSONObject(gnipDataInput);
 				 if (jsonData.has("geo")
 							&& jsonData.get("geo") != null
@@ -29,8 +32,11 @@ public class LocationFinder {
 						JSONObject geoObject=geo.getJSONObject("coordinates");
 						double latitude=(double) geoObject.get("latitude");
 						double longitude=(double) geoObject.get("longitude");
-						 countryLocation=CompletePositionDecoder.getInstance().getNearestLocation(longitude,latitude );
-						return countryLocation;
+						geoLocation=CompletePositionDecoder.getInstance().getNearestLocation(longitude,latitude );
+						geoDetails.put("countrycode",geoLocation.getCountry());
+						geoDetails.put("region", geoLocation.getSubRegionName());
+						geoDetails.put("name", geoLocation.getName());
+						return geoDetails;
 						}
 
 					 
@@ -41,6 +47,9 @@ public class LocationFinder {
 					JSONObject location = (JSONObject) jsonData.get("location");
 					if (location != null) {
 					List<Point2D.Double>polygon=new ArrayList<>();
+					String displayName=(String) location.get("displayName");
+					String []regions=displayName.split(",");
+					String displayRegion=regions[0];
 					JSONObject locationObject=(JSONObject) location.getJSONObject("geo").getJSONObject("coordinates").getJSONArray("holes").get(0);
 					JSONArray locateCordinates=(JSONArray) locationObject.getJSONArray("coordinates");
 					for(int i=0;i<locateCordinates.length();i++){
@@ -49,8 +58,14 @@ public class LocationFinder {
 						polygon.add(points);
 	
 						}
-					 countryLocation=CompletePositionDecoder.getInstance().getNearestLocation(polygon);
-					return countryLocation;
+					geoLocation=CompletePositionDecoder.getInstance().getNearestLocation(polygon);
+					if(displayRegion!=geoLocation.getSubRegionName()){
+						logger.warn("Not Accurate Place");
+					}
+					geoDetails.put("countrycode",geoLocation.getCountry());
+					geoDetails.put("region", geoLocation.getSubRegionName());
+					geoDetails.put("name", geoLocation.getName());
+					return geoDetails;
 					
 
 					}
@@ -71,14 +86,21 @@ public class LocationFinder {
 						String countryCode= gnipData.get("countryCode").toString();
 						String locality=gnipData.get("locality").toString();
 						String country=gnipData.get("country").toString();
-						countryLocation=CompletePositionDecoder.getInstance().getNearestLocation(longitude,latitude );
+						geoLocation=CompletePositionDecoder.getInstance().getNearestLocation(longitude,latitude );
+						geoDetails.put("countrycode",geoLocation.getCountry());
+						geoDetails.put("region", geoLocation.getSubRegionName());
+						geoDetails.put("name", geoLocation.getName());
 						
 					}
 					
 				}
 				
-				return countryLocation;
-			}
+				return geoDetails;
+		}catch(Exception e){
+			e.printStackTrace();
+			return geoDetails;
+		}
+	}
 		 
 
 	}
